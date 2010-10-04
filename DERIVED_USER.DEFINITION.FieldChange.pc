@@ -1,0 +1,40 @@
+/******************************************************************************
+Summit Upgrade Modification Log	
+
+Object Type:  Record PeopleCode
+Object Name:  DERIVED_USER.DEFINITION.FieldChange
+
+Modification Number:  RC-H-PT-111
+Developer(s):  Dan Iverson
+Function Name(s):  
+Description: Update the Record PeopleCode to reference the new view name.
+******************************************************************************/
+/************************ Begin Summit Modification RC-H-PT-111 *********************
+Programmer: Dan Iverson
+Mod Date: 12/11/2006
+Detail Design #: DD-H-PT-111.doc
+Function Name: 
+Description: Update the Record Peoplecode to reference the new view name.
+******************************************************************************/
+/*Transfer page to Role Component*/
+/************************* Begin Comment Out Original PS Code ******************
+If Upper(PSROLEUSER_VW.ROLENAME) = "PEOPLESOFT ADMINISTRATOR" Then
+ MessageBox(16, "", 48, 19, "Message Not Found");
+Else
+   Transfer( False, MenuName.MAINTAIN_SECURITY, BarName.USE, ItemName.ROLEMAINT, Page.ROLEDEFN, "U", PSROLEUSER_VW.ROLENAME);
+End-If;
+************************** End Comment Out Original PS Code *******************/
+If %Component = "RC_USER_ROLES" Then
+   If Upper(RC_ROLEUSER_VW.ROLENAME) = "PEOPLESOFT ADMINISTRATOR" Then
+      MessageBox(16, "", 48, 19, "Message Not Found");
+   Else
+      Transfer( False, MenuName.MAINTAIN_SECURITY, BarName.USE, ItemName.ROLEMAINT, Page.ROLEDEFN, "U", RC_ROLEUSER_VW.ROLENAME);
+   End-If;
+Else
+   If Upper(PSROLEUSER_VW.ROLENAME) = "PEOPLESOFT ADMINISTRATOR" Then
+      MessageBox(16, "", 48, 19, "Message Not Found");
+   Else
+      Transfer( False, MenuName.MAINTAIN_SECURITY, BarName.USE, ItemName.ROLEMAINT, Page.ROLEDEFN, "U", PSROLEUSER_VW.ROLENAME);
+   End-If;
+End-If
+/************************* End Summit Modification RC-H-PT-111 *********************/

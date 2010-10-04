@@ -1,0 +1,22 @@
+/******************************************************************************
+Summit Upgrade Modification Log	
+
+Object Type:  Record PeopleCode
+Object Name:  RC_ROLEUSER_VW.ROLENAME.RowInit
+
+Modification Number:  RC-H-PT-111
+Developer(s):  Dan Iverson
+Function Name(s): 
+Description: Grey out the Rolename if it is dynamically assigned.
+******************************************************************************/
+/************************ Begin Summit Modification RC-H-PT-111 *********************
+Programmer: Dan Iverson
+Mod Date: 12/6/2006
+Detail Design #: DD-H-PT-111.doc
+Function Name: 
+Description: Grey out the Rolename if it is dynamically assigned.
+******************************************************************************/
+
+If RC_ROLEUSER_VW.DYNAMIC_SW = "Y" Then
+   Gray(RC_ROLEUSER_VW.ROLENAME);
+End-If;

@@ -1,0 +1,41 @@
+/******************************************************************************
+Summit Upgrade Modification Log	
+
+Object Type:  Page PeopleCode
+Object Name:  RC_USER_ROLES.Activate
+
+Modification Number:  RC-H-PT-111
+Developer(s):  Dan Iverson
+Function Name(s): 
+Description: This PeopleCode was copied from the delivered Page USER_ROLES.
+	The view refence was changed to the modified view RC_ROLEUSER_VW. 
+	RC_ROLEUSER_VW is modified copy of the delivered view PSROLEUSER_VW.
+******************************************************************************/
+Local Grid &grid;
+Local GridColumn &GRIDCOLUMN;
+
+/************************ Begin Summit Modification RC-H-PT-111 *********************
+Programmer: Dan Iverson
+Mod Date: 12/6/2006
+Detail Design #: DD-H-PT-111.doc
+Function Name: 
+Description: This PeopleCode was copied from the delivered Page USER_ROLES.
+	The view refence was changed to the modified view RC_ROLEUSER_VW.
+******************************************************************************/
+/************************* Begin Comment Out Original PS Code ******************
+
+rem hide pushbutton column headers;
+&grid = GetGrid(Panel.USER_ROLES, "PSROLEUSER_VW");
+&grid.LABEL_TXT_LBL.Label = " ";
+
+************************** End Comment Out Original PS Code *******************/
+rem hide pushbutton column headers;
+&grid = GetGrid(Panel.RC_USER_ROLES, "RC_ROLEUSER_VW");
+&grid.LABEL_TXT_LBL.Label = " ";
+/************************ End Summit Modification RC-H-PT-111 **********************/
+
+rem hide view definition column if in distributed user component;
+If %Component = Component.USERMAINT_DIST Then
+   &GRIDCOLUMN = &grid.GetColumn("VIEW_DEFINITION");
+   &GRIDCOLUMN.Visible = False;
+End-If;
