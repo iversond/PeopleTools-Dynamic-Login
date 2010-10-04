@@ -1,0 +1,72 @@
+Record: RC_SIGNON.EXTERNAL_SYSTEM.FieldDefault
+/******************************************************************************
+Upgrade Modification Log	
+
+Object Type:  Signon PeopleCode
+Object Name:  RC_SIGNON.EXTERNAL_SYSTEM.FieldDefault
+
+Modification Number:  RC-H-PT-111
+Developer(s):  Dan Iverson
+Function Name(s):  DynamicSecurity
+Description: Signon PeopleCode that checks if a user is logging in from an external computer and updates their security.
+******************************************************************************/
+/************************ Begin Modification RC-H-PT-111 *********************
+Programmer: Dan Iverson
+Mod Date: 12/6/2006
+Detail Design #: DD-H-PT-111.doc
+Function Name: Dynamic Security
+Description: Signon PeopleCode that checks if a user is logging in from an external computer and updates their security.
+******************************************************************************/
+
+Function DynamicSecurity()
+   
+   Local string &URI, &Protocal, &ServerName, &LogFile, &External, &userID;
+   Local number &ProtocalLength, &ServerNameEnd, &ServerNameLength;
+   Local File &MyFile;
+   
+   /* Get Login URI */
+   &URI = %Request.ContentURI;
+   
+   /* Determine if SSL is used */
+   &Protocal = Substring(&URI, 0, 5);
+   If Lower(&Protocal) = "https" Then
+      &ProtocalLength = 9;
+   Else
+      &ProtocalLength = 8;
+   End-If;
+   
+   /* Find server name from login URI */
+   &ServerNameEnd = Find("/", &URI, 10);
+   &ServerNameLength = &ServerNameEnd - &ProtocalLength;
+   &ServerName = Substring(&URI, &ProtocalLength, &ServerNameLength);
+   
+   /* Check if the URI is for an external login */
+   SQLExec(SQL.RC_EXTERNAL_SERVER, &ServerName, &External);
+   
+   &userID = Upper(%SignonUserId);
+   /* Update PSROLEUSER table based on internal/external security  */
+   SQLExec(SQL.RC_DELETE_ROLEUSER, &userID);
+   If &External = "Y" Then
+      /* Insert external user roles from RC_ROLES table */
+      SQLExec(SQL.RC_INSERT_EXROLEUSER, &userID);
+   Else
+      /* Insert internal roles from RC_ROLEUSER table */
+      SQLExec(SQL.RC_INSERT_RCROLEUSER, &userID, &userID);
+   End-If;
+   
+   
+   /* Write Log File */
+   SQLExec(SQL.RC_SERVER_LOGGING, &ServerName, &LogFile);
+   If &LogFile = "Y" Then
+      &MyFile = GetFile("DynamicLogin.log", "A", %FilePath_Relative);
+      If &MyFile.IsOpen Then
+         &MyFile.WriteLine(%Datetime | "  " | "URI: " | &URI | "   " | "UserID: " | &userID);
+         &MyFile.WriteLine(%Datetime | "  " | "ServerName: " | &ServerName | "  " | "External: " | &External);
+         /*&MyFile.WriteLine(%Datetime | "  " | "StartSubString: " | &ProtocalLength | "  " | "Length: " | &ServerNameLength);*/
+         &MyFile.Close();
+      End-If;
+   End-If;
+   
+End-Function;
+
+/************************* End Modification RC-H-PT-111 *********************/
